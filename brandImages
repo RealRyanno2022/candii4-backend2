@@ -1,0 +1,14 @@
+// Import your brandData
+import brandData from './brandData.js';
+
+// Generate the import statements
+let importStatements = '';
+Object.values(brandData).forEach((product) => {
+  // Assume the image name is the last part of the path, without the extension
+  const imageName = product.image.split('/').pop().split('.')[0];
+
+  // Generate the import statement
+  importStatements += `import ${imageName} from '${product.image}';\n`;
+});
+
+console.log(importStatements);
