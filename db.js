@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('"C:/Users/danie/Desktop/GuardedPrivateKey(Candii)/candii-app-firebase-adminsdk-herbp-6730a7f3fd.json"');
+const serviceAccount = require('./candii-a8618-firebase-adminsdk-ssavy-7006eb0d3a.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
