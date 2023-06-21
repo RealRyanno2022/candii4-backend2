@@ -15,7 +15,49 @@ router.get('/', (req, res) => {
 router.post('/register', auth.register);
 router.post('/login', auth.login);
 router.get('/client_token', getClientToken);
-router.post('/checkout', processPayment);
+router.post('/checkout', async (req, res) => {
+  const { paymentMethodNonce, amount, productId, userId } = req.body;
+
+  gateway.transaction.sale({
+    amount,
+    paymentMethodNonce,
+    options: {
+      submitForSettlement: true,
+    },
+  }, async (err, result) => {
+    if (err || !result.success) {
+      res.status(500).send(err || 'Payment error');
+    } else {
+      // Payment is successful, now we add this product to user's purchase history
+      try {
+        const userRef = db.collection('users').doc(userId);
+        await userRef.update({
+          purchases: admin.firestore.FieldValue.arrayUnion(productId)
+        });
+      } catch (err) {
+        res.status(500).send('Error updating user purchases');
+      }
+      
+      res.send('Payment successful');
+    }
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 router.post('/posts', posts.createPost);
 router.get('/posts', posts.getAllPosts);
 router.get('/posts/:id', posts.getPostById);
