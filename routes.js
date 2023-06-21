@@ -107,13 +107,9 @@ router.post('/execute_transaction', (req, res) => {
 });
 
 router.post('/save_user_information', async (req, res) => {
-  const { state, country, email
-    // , address, phoneNumber, postCode, firstName, lastName 
-  } = req.body;
+  const { state, country, email, address, phoneNumber, postCode, firstName, lastName } = req.body;
 
-  if (!req.body || !req.body.state || !req.body.country || !req.body.email 
-    // || !req.body.address || !req.body.phoneNumber || !req.body.postCode || !req.body.firstName || !req.body.lastName
-    ) {
+  if (!req.body || !req.body.state || !req.body.country || !req.body.email || !req.body.address || !req.body.phoneNumber || !req.body.postCode || !req.body.firstName || !req.body.lastName) {
     return res.status(400).send('Missing fields in request body');
   }
 
@@ -162,7 +158,7 @@ router.post('/save_user_information', async (req, res) => {
 // Use the router
 app.use(router);
 
-// Use middleware 
+// Use middleware
 app.use(bodyParser.json()); // Use body-parser middleware to parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); 
 
