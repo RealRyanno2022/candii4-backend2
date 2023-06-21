@@ -107,18 +107,39 @@ router.post('/save_user_information', async (req, res) => {
   const { state, country, email, address, phoneNumber, postCode, firstName, lastName } = req.body;
 
   try {
-    const docRef = db.collection('users').doc(); // You can replace 'users' with your own collection name
+    const userRef = db.collection('users');
+    
+    // Check if user with this email already exists
+    const snapshot = await userRef.where('email', '==', email).get();
 
-    await docRef.set({
-      state, 
-      country, 
-      email, 
-      address, 
-      phoneNumber, 
-      postCode, 
-      firstName, 
-      lastName
-    });
+    if (snapshot.empty) {
+      // User does not exist, create new user document
+      const newUserRef = userRef.doc();
+      await newUserRef.set({
+        state, 
+        country, 
+        email, 
+        address, 
+        phoneNumber, 
+        postCode, 
+        firstName, 
+        lastName
+      });
+    } else {
+      // User already exists, update user document
+      for (let doc of snapshot.docs) {
+        await doc.ref.update({
+          state, 
+          country, 
+          email, 
+          address, 
+          phoneNumber, 
+          postCode, 
+          firstName, 
+          lastName
+        });
+      };
+    }
 
     res.status(200).json({ message: 'User information saved successfully' });
   } catch (error) {
@@ -126,6 +147,20 @@ router.post('/save_user_information', async (req, res) => {
     res.status(500).json({ message: 'Error saving user information', error: error.toString() });
   }
 });
+
+let promises = snapshot.docs.map(doc => doc.ref.update({
+  state, 
+  country, 
+  email, 
+  address, 
+  phoneNumber, 
+  postCode, 
+  firstName, 
+  lastName
+}));
+
+await Promise.all(promises);
+
 
 // Use the router
 app.use(router);
