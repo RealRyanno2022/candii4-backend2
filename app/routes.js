@@ -64,21 +64,6 @@ router.post('/checkout', async (req, res) => {
   });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.post('/posts', posts.createPost);
 router.get('/posts', posts.getAllPosts);
 router.get('/posts/:id', posts.getPostById);
@@ -118,28 +103,33 @@ router.post('/execute_transaction', (req, res) => {
   );
 });
 
-router.post('/save_user_information', async (req, res) => {
-  const { state, country, email, address, phoneNumber, postCode, firstName, lastName } = req.body;
+// router.post('/save_user_information', async (req, res) => {
+//   const { state, country, email, address, phoneNumber, postCode, firstName, lastName } = req.body;
 
-  try {
-    const docRef = db.collection('users').doc(); // You can replace 'users' with your own collection name
+//   try {
+//     const docRef = db.collection('users').doc(); // You can replace 'users' with your own collection name
 
-    await docRef.set({
-      state, 
-      country, 
-      email, 
-      address, 
-      phoneNumber, 
-      postCode, 
-      firstName, 
-      lastName
-    });
+//     await docRef.set({
+//       state, 
+//       country, 
+//       email, 
+//       address, 
+//       phoneNumber, 
+//       postCode, 
+//       firstName, 
+//       lastName
+//     });
 
-    res.status(200).json({ message: 'User information saved successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error saving user information', error: error.toString() });
-  }
-});
+//     res.status(200).json({ message: 'User information saved successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error saving user information', error: error.toString() });
+//   }
+// });
+
+
+
+
+
 
 
 
