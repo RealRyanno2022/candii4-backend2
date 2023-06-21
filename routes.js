@@ -127,18 +127,18 @@ router.post('/save_user_information', async (req, res) => {
       });
     } else {
       // User already exists, update user document
-      for (let doc of snapshot.docs) {
-        await doc.ref.update({
-          state, 
-          country, 
-          email, 
-          address, 
-          phoneNumber, 
-          postCode, 
-          firstName, 
-          lastName
-        });
-      };
+      let promises = snapshot.docs.map(doc => doc.ref.update({
+        state, 
+        country, 
+        email, 
+        address, 
+        phoneNumber, 
+        postCode, 
+        firstName, 
+        lastName
+      }));
+
+      await Promise.all(promises);
     }
 
     res.status(200).json({ message: 'User information saved successfully' });
@@ -147,20 +147,6 @@ router.post('/save_user_information', async (req, res) => {
     res.status(500).json({ message: 'Error saving user information', error: error.toString() });
   }
 });
-
-let promises = snapshot.docs.map(doc => doc.ref.update({
-  state, 
-  country, 
-  email, 
-  address, 
-  phoneNumber, 
-  postCode, 
-  firstName, 
-  lastName
-}));
-
-await Promise.all(promises);
-
 
 // Use the router
 app.use(router);
