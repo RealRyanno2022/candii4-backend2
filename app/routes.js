@@ -1,4 +1,6 @@
 const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
 const auth = require('./auth');
 const braintree = require('./braintree');
 const email = require('./email');
@@ -6,16 +8,34 @@ const posts = require('./posts');
 const { getClientToken, processPayment } = require('./braintree.js');
 const sendEmail = require('./sendEmail'); // Update the import statement
 
+// Setup CORS
+const app = express();
+app.use(cors());
+
+// Setup request logging
+app.use(morgan('combined'));
+
 const router = express.Router();
 router.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
 
+const express = require('express');
+const auth = require('./auth');
+const braintree = require('./braintree');
+const email = require('./email');
+const posts = require('./posts');
+const { getClientToken, processPayment } = require('./braintree.js');
+const sendEmail = require('./sendEmail'); // Update the import statement
+
+
 router.post('/register', auth.register);
 router.post('/login', auth.login);
 router.get('/client_token', getClientToken);
 router.post('/checkout', async (req, res) => {
+  console.log('Request body:', req.body);
+  
   const { paymentMethodNonce, amount, productId, userId } = req.body;
 
   gateway.transaction.sale({
@@ -26,6 +46,7 @@ router.post('/checkout', async (req, res) => {
     },
   }, async (err, result) => {
     if (err || !result.success) {
+      console.error('Error:', err || 'Payment error');
       res.status(500).send(err || 'Payment error');
     } else {
       // Payment is successful, now we add this product to user's purchase history
@@ -34,11 +55,11 @@ router.post('/checkout', async (req, res) => {
         await userRef.update({
           purchases: admin.firestore.FieldValue.arrayUnion(productId)
         });
+        res.send('Payment successful');
       } catch (err) {
+        console.error('Error updating user purchases:', err);
         res.status(500).send('Error updating user purchases');
       }
-      
-      res.send('Payment successful');
     }
   });
 });
