@@ -7,6 +7,15 @@ const email = require('./email');
 const posts = require('./posts');
 const { getClientToken, processPayment } = require('./braintree.js');
 const sendEmail = require('./sendEmail'); // Update the import statement
+const admin = require('firebase-admin');
+const serviceAccount = require('./candii-a8618-firebase-adminsdk-ssavy-7006eb0d3a.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
 
 // Setup CORS
 const app = express();
@@ -17,7 +26,7 @@ app.use(morgan('combined'));
 
 const router = express.Router();
 router.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.send('Server running');
 });
 
 
@@ -125,12 +134,4 @@ router.post('/save_user_information', async (req, res) => {
     res.status(500).json({ message: 'Error saving user information', error: error.toString() });
   }
 });
-
-
-
-
-
-
-
-
 module.exports = router;
