@@ -7,7 +7,7 @@ const app = express();
 
 const port = process.env.PORT || 19000;
 
-app.use(cors('*'));
+app.use(cors());
 
 app.use(express.json());  // you only need one body-parsing middleware
 app.use(router);
