@@ -29,6 +29,10 @@ app.use(morgan('combined'));
 // Initialize router
 const router = express.Router();
 
+// Use middleware
+app.use(bodyParser.json()); // Use body-parser middleware to parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); 
+
 // Routes
 router.get('/', (req, res) => {
   res.send('Server running');
@@ -107,11 +111,11 @@ router.post('/execute_transaction', (req, res) => {
 });
 
 router.post('/save_user_information', async (req, res) => {
-  const { state, country, email, address, phoneNumber, postCode, firstName, lastName } = req.body;
-
   if (!req.body || !req.body.state || !req.body.country || !req.body.email || !req.body.address || !req.body.phoneNumber || !req.body.postCode || !req.body.firstName || !req.body.lastName) {
     return res.status(400).send('Missing fields in request body');
   }
+  
+  const { state, country, email, address, phoneNumber, postCode, firstName, lastName } = req.body;
 
   try {
     const userRef = db.collection('users');
@@ -158,9 +162,7 @@ router.post('/save_user_information', async (req, res) => {
 // Use the router
 app.use(router);
 
-// Use middleware
-app.use(bodyParser.json()); // Use body-parser middleware to parse JSON bodies
-app.use(bodyParser.urlencoded({ extended: true })); 
+
 
 // Start the server
 const port = process.env.PORT || 19000; 
