@@ -47,6 +47,7 @@ const getClientToken = (req, res) => {
 };
 
 const processPayment = (req, res) => {
+  console.log('Processing payment...');
   const { paymentMethodNonce, amount } = req.body;
 
   gateway.transaction.sale({
@@ -70,6 +71,7 @@ router.post('/register', auth.register);
 router.post('/login', auth.login);
 router.get('/client_token', getClientToken);
 router.post('/checkout', processPayment);
+router.post('/execute_transaction', processPayment);
 
 router.post('/posts', posts.createPost);
 router.get('/posts', posts.getAllPosts);
@@ -87,8 +89,6 @@ router.post('/send_email', async (req, res) => {
     res.status(500).json({ message: 'Error sending email.', error: error.toString() });
   }
 });
-
-router.post('/execute_transaction', processPayment);
 
 router.post('/save_user_information', async (req, res) => {
   if (!req.body || !req.body.state || !req.body.country || !req.body.email || !req.body.address || !req.body.phoneNumber || !req.body.postCode || !req.body.firstName || !req.body.lastName) {
