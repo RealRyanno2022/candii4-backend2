@@ -2,17 +2,21 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const bodyParser = require('body-parser'); 
 const auth = require('./auth');
-const braintree = require('./braintree');
-const email = require('./email');
 const posts = require('./posts');
-const { getClientToken, processPayment } = require('./braintree.js');
 const sendEmail = require('./sendEmail');
 const admin = require('firebase-admin');
 const serviceAccount = require('./candii-a8618-firebase-adminsdk-ssavy-7006eb0d3a.json');
-const bodyParser = require('body-parser'); 
+const braintreeModule = require('braintree');
 
-
+// Braintree Setup
+const gateway = new braintreeModule.BraintreeGateway({
+  environment: braintreeModule.Environment.Sandbox,
+  merchantId: '8wdhyhqpnsg7sfmx',
+  publicKey: '7dgvvkf768mptyz2',
+  privateKey: 'e0232aae435589c2233372965a5aa1ea',
+});
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
@@ -25,26 +29,25 @@ const db = admin.firestore();
 const app = express();
 app.use(cors());
 app.use(morgan('combined'));
+app.use(bodyParser.json()); // Use body-parser middleware to parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); 
 
 // Initialize router
 const router = express.Router();
 
-// Use middleware
-app.use(bodyParser.json()); // Use body-parser middleware to parse JSON bodies
-app.use(bodyParser.urlencoded({ extended: true })); 
+// Function Declarations
+const getClientToken = (req, res) => {
+  gateway.clientToken.generate({}, (err, response) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.send(response.clientToken);
+    }
+  });
+};
 
-// Routes
-router.get('/', (req, res) => {
-  res.send('Server running');
-});
-
-router.post('/register', auth.register);
-router.post('/login', auth.login);
-router.get('/client_token', getClientToken);
-router.post('/checkout', async (req, res) => {
-  console.log('Request body:', req.body);
-  
-  const { paymentMethodNonce, amount, productId, userId } = req.body;
+const processPayment = (req, res) => {
+  const { paymentMethodNonce, amount } = req.body;
 
   gateway.transaction.sale({
     amount,
@@ -52,25 +55,21 @@ router.post('/checkout', async (req, res) => {
     options: {
       submitForSettlement: true,
     },
-  }, async (err, result) => {
+  }, (err, result) => {
     if (err || !result.success) {
-      console.error('Error:', err || 'Payment error');
       res.status(500).send(err || 'Payment error');
     } else {
-      // Payment is successful, now we add this product to user's purchase history
-      try {
-        const userRef = db.collection('users').doc(userId);
-        await userRef.update({
-          purchases: admin.firestore.FieldValue.arrayUnion(productId)
-        });
-        res.send('Payment successful');
-      } catch (err) {
-        console.error('Error updating user purchases:', err);
-        res.status(500).send('Error updating user purchases');
-      }
+      res.send('Payment successful');
     }
   });
-});
+};
+
+// Route Handlers
+router.get('/', (req, res) => { res.send('Server running'); });
+router.post('/register', auth.register);
+router.post('/login', auth.login);
+router.get('/client_token', getClientToken);
+router.post('/checkout', processPayment);
 
 router.post('/posts', posts.createPost);
 router.get('/posts', posts.getAllPosts);
@@ -89,26 +88,7 @@ router.post('/send_email', async (req, res) => {
   }
 });
 
-router.post('/execute_transaction', (req, res) => {
-  const { paymentMethodNonce, amount } = req.body;
-
-  gateway.transaction.sale(
-    {
-      amount,
-      paymentMethodNonce,
-      options: {
-        submitForSettlement: true,
-      },
-    },
-    (err, result) => {
-      if (err || !result.success) {
-        res.status(500).send(err || 'Payment error');
-      } else {
-        res.send('Payment successful');
-      }
-    }
-  );
-});
+router.post('/execute_transaction', processPayment);
 
 router.post('/save_user_information', async (req, res) => {
   if (!req.body || !req.body.state || !req.body.country || !req.body.email || !req.body.address || !req.body.phoneNumber || !req.body.postCode || !req.body.firstName || !req.body.lastName) {
@@ -161,8 +141,6 @@ router.post('/save_user_information', async (req, res) => {
 
 // Use the router
 app.use(router);
-
-
 
 // Start the server
 const port = process.env.PORT || 19000; 
