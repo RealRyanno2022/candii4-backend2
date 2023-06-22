@@ -47,8 +47,16 @@ const getClientToken = (req, res) => {
 };
 
 const processPayment = (req, res) => {
-  console.log('Processing payment...');
   const { paymentMethodNonce, amount } = req.body;
+
+  console.log('Processing payment...');
+  console.log('paymentMethodNonce:', paymentMethodNonce);
+  console.log('amount:', amount);
+
+  if (!paymentMethodNonce || !amount) {
+    console.error('Missing paymentMethodNonce or amount');
+    return res.status(400).json({ error: 'Missing paymentMethodNonce or amount' });
+  }
 
   gateway.transaction.sale({
     amount,
@@ -57,11 +65,16 @@ const processPayment = (req, res) => {
       submitForSettlement: true,
     },
   }, (err, result) => {
+    console.log('Transaction sale result:', result);
+    console.log('Transaction sale error:', err);
+
     if (err || !result.success) {
-      res.status(500).send(err || 'Payment error');
-    } else {
-      res.send('Payment successful');
-    }
+      console.error('Payment error:', err || 'Payment error');
+      return res.status(500).json({ error: err || 'Payment error' });
+    } 
+
+    console.log('Payment successful');
+    res.json({ message: 'Payment successful' });
   });
 };
 
