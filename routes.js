@@ -99,7 +99,7 @@ router.post('/execute_transaction', processPayment);
 
 // Add a route to serve the braintree.html file
 router.get('/payment', (req, res) => {
-  res.sendFile(path.join(__dirname, 'braintree-helper/dist', 'bundle.js'));
+  res.sendFile(path.join(__dirname, 'public/braintree-helper/dist', 'bundle.js'));
 });
 
 
