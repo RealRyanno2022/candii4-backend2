@@ -40,6 +40,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".input-error {\n  border: 1px solid re
 module.exports = function (cssWithMappingToString) {
   var list = [];
 
+// git test
+
   // return the list of modules as css string
   list.toString = function toString() {
     return this.map(function (item) {

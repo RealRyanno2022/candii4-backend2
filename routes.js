@@ -47,11 +47,11 @@ const getClientToken = (req, res) => {
   });
 };
 
-app.use(express.static(path.join(__dirname, 'backend/public/braintree-handler/dist')));
+app.use(express.static(path.join(__dirname, 'public/braintree-handler/dist')));
 
 app.get('/payment', (req, res) => {
   // Serve your bundled React app
-  res.sendFile(path.join(__dirname, 'backend/public/braintree-helper/dist', 'bundle.js'));
+  res.sendFile(path.join(__dirname, 'public/braintree-helper/dist', 'bundle.js'));
 });
 
 
@@ -99,7 +99,7 @@ router.post('/execute_transaction', processPayment);
 
 // Add a route to serve the braintree.html file
 router.get('/payment', (req, res) => {
-  res.sendFile(path.join(__dirname, 'backend/public/braintree-helper/dist', 'bundle.js'));
+  res.sendFile(path.join(__dirname, 'public/braintree-helper/dist', 'bundle.js'));
 });
 
 
