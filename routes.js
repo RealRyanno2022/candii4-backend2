@@ -9,6 +9,7 @@ const sendEmail = require('./sendEmail');
 const admin = require('firebase-admin');
 const serviceAccount = require('./candii-a8618-firebase-adminsdk-ssavy-7006eb0d3a.json');
 const braintreeModule = require('braintree');
+const path = require('path');
 
 // Braintree Setup
 const gateway = new braintreeModule.BraintreeGateway({
@@ -45,6 +46,8 @@ const getClientToken = (req, res) => {
     }
   });
 };
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const processPayment = (req, res) => {
   const { paymentMethodNonce, amount } = req.body;
@@ -159,6 +162,11 @@ app.use(router);
 const port = process.env.PORT || 19000; 
 app.listen(port, function () {
   console.log('Express server is up and running on port ' + port);
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
 module.exports = router;
