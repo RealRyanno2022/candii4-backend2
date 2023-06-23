@@ -18,7 +18,7 @@
     "build": "webpack",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "cd backend/public/braintree-handler && npm install && webpack --config webpack.config.js"
   },
   "eslintConfig": {
     "extends": [
