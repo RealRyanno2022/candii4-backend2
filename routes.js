@@ -47,7 +47,7 @@ const getClientToken = (req, res) => {
   });
 };
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'braintree-handler')));
 
 const processPayment = (req, res) => {
   const { paymentMethodNonce, amount } = req.body;
@@ -91,7 +91,7 @@ router.post('/execute_transaction', processPayment);
 
 // Add a route to serve the braintree.html file
 router.get('/payment', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'braintree.html'));
+  res.sendFile(path.join(__dirname, 'braintree-handler', 'Payment.tsx'));
 });
 
 router.post('/posts', posts.createPost);
