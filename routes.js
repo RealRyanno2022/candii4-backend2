@@ -87,6 +87,8 @@ const processPayment = (req, res) => {
   });
 };
 
+// hello
+
 // Route Handlers
 router.get('/', (req, res) => { res.send('Server running'); });
 router.post('/register', auth.register);
