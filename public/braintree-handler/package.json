@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "webpack",
+    "build": "webpack --mode production",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "heroku-postbuild": "cd backend/public/braintree-handler && npm install && webpack --config webpack.config.js"
