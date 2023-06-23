@@ -89,6 +89,11 @@ router.get('/client_token', getClientToken);
 router.post('/checkout', processPayment);
 router.post('/execute_transaction', processPayment);
 
+// Add a route to serve the braintree.html file
+router.get('/payment', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'braintree.html'));
+});
+
 router.post('/posts', posts.createPost);
 router.get('/posts', posts.getAllPosts);
 router.get('/posts/:id', posts.getPostById);
