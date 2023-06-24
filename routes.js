@@ -56,34 +56,32 @@ app.get('/payment', (req, res) => {
 
 
 const processPayment = (req, res) => {
-  const { paymentMethodNonce, amount } = req.body;
+  const { nonce } = req.body;
 
-  console.log('Processing payment...');
-  console.log('paymentMethodNonce:', paymentMethodNonce);
-  console.log('amount:', amount);
-
-  if (!paymentMethodNonce || !amount) {
-    console.error('Missing paymentMethodNonce or amount');
-    return res.status(400).json({ error: 'Missing paymentMethodNonce or amount' });
+  if (!nonce) {
+    console.error('Missing nonce in request body');
+    return res.status(400).json({ error: 'Missing nonce in request body' });
   }
 
   gateway.transaction.sale({
-    amount,
-    paymentMethodNonce,
+    amount: '10.00',  // Define an amount for your transaction
+    paymentMethodNonce: nonce,
     options: {
       submitForSettlement: true,
     },
   }, (err, result) => {
-    console.log('Transaction sale result:', result);
-    console.log('Transaction sale error:', err);
+    if (err) {
+      console.error('Payment error:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
 
-    if (err || !result.success) {
-      console.error('Payment error:', err || 'Payment error');
-      return res.status(500).json({ error: err || 'Payment error' });
-    } 
-
-    console.log('Payment successful');
-    res.json({ message: 'Payment successful' });
+    if (result.success) {
+      console.log('Payment processed successfully:', result.transaction.id);
+      res.json({ message: 'Payment processed successfully', transactionId: result.transaction.id });
+    } else {
+      console.error('Payment failed:', result.message);
+      res.status(500).json({ error: result.message });
+    }
   });
 };
 
@@ -94,7 +92,7 @@ router.get('/', (req, res) => { res.send('Server running'); });
 router.post('/register', auth.register);
 router.post('/login', auth.login);
 router.get('/client_token', getClientToken);
-router.post('/checkout', processPayment);
+router.post('/payment', processPayment);
 router.post('/execute_transaction', processPayment);
 
 // Add a route to serve the braintree.html file
