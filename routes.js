@@ -55,7 +55,7 @@ const getClientToken = (req, res) => {
 
 
 app.get('/braintree', function (req, res) {
-  res.sendFile(path.join(__dirname, 'braintree.html'));
+  res.sendFile(path.join(__dirname, 'public/braintree.html'));
 });
 
 const processPayment = (req, res) => {
