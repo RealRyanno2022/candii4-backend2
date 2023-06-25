@@ -37,7 +37,7 @@ app.use(morgan('combined'));
 app.use(bodyParser.json()); // Use body-parser middleware to parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Initialize router
 const router = express.Router();
@@ -55,7 +55,7 @@ const getClientToken = (req, res) => {
 
 
 app.get('/braintree', function (req, res) {
-  res.sendFile(path.join(__dirname, 'braintree.html'));
+  res.sendFile(path.join(__dirname, 'public/braintree.html'));
 });
 
 const processPayment = (req, res) => {
