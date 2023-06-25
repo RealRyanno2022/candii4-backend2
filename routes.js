@@ -51,7 +51,6 @@ const getClientToken = (req, res) => {
   });
 };
 
-app.use(express.static(path.join(__dirname, 'public/braintree-handler/dist')));
 
 app.get('/braintree', function (req, res) {
   res.sendFile(path.join(__dirname, 'braintree.html'));
@@ -125,10 +124,7 @@ router.get('/client_token', getClientToken);
 router.post('/payment', processPayment);
 router.post('/execute_transaction', processPayment);
 
-// Add a route to serve the braintree.html file
-router.get('/payment', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/braintree-helper/dist', 'bundle.js'));
-});
+
 
 
 
