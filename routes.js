@@ -37,7 +37,7 @@ app.use(morgan('combined'));
 app.use(bodyParser.json()); // Use body-parser middleware to parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-app.use(express.static('public'));ß
+app.use(express.static('public'));
 
 // Initialize router
 const router = express.Router();
