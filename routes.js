@@ -11,6 +11,11 @@ const serviceAccount = require('./candii-a8618-firebase-adminsdk-ssavy-7006eb0d3
 const braintreeModule = require('braintree');
 const path = require('path');
 
+const Evervault = require('@evervault/sdk');
+
+const evervaultClient = new Evervault('<your-evervault-api-key>');
+
+
 // Braintree Setup
 const gateway = new braintreeModule.BraintreeGateway({
   environment: braintreeModule.Environment.Sandbox,
@@ -123,19 +128,21 @@ router.post('/save_user_information', async (req, res) => {
   if (!req.body || !req.body.state || !req.body.country || !req.body.email || !req.body.address || !req.body.phoneNumber || !req.body.postCode || !req.body.firstName || !req.body.lastName) {
     return res.status(400).send('Missing fields in request body');
   }
-  
+
   const { state, country, email, address, phoneNumber, postCode, firstName, lastName } = req.body;
 
   try {
     const userRef = db.collection('users');
-    
+
     // Check if user with this email already exists
     const snapshot = await userRef.where('email', '==', email).get();
 
     if (snapshot.empty) {
       // User does not exist, create new user document
       const newUserRef = userRef.doc();
-      await newUserRef.set({
+
+      // Encrypt user data using Evervault before saving
+      const encryptedData = await evervaultClient.encrypt({
         state, 
         country, 
         email, 
@@ -145,18 +152,25 @@ router.post('/save_user_information', async (req, res) => {
         firstName, 
         lastName
       });
+
+      await newUserRef.set(encryptedData);
     } else {
       // User already exists, update user document
-      let promises = snapshot.docs.map(doc => doc.ref.update({
-        state, 
-        country, 
-        email, 
-        address, 
-        phoneNumber, 
-        postCode, 
-        firstName, 
-        lastName
-      }));
+      let promises = snapshot.docs.map(doc => {
+        // Encrypt user data using Evervault before updating
+        const encryptedData = evervaultClient.encrypt({
+          state, 
+          country, 
+          email, 
+          address, 
+          phoneNumber, 
+          postCode, 
+          firstName, 
+          lastName
+        });
+
+        return doc.ref.update(encryptedData);
+      });
 
       await Promise.all(promises);
     }
@@ -167,6 +181,7 @@ router.post('/save_user_information', async (req, res) => {
     res.status(500).json({ message: 'Error saving user information', error: error.toString() });
   }
 });
+
 
 // Use the router
 app.use(router);
