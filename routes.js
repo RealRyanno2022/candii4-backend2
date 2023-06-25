@@ -14,9 +14,9 @@ const path = require('path');
 // Braintree Setup
 const gateway = new braintreeModule.BraintreeGateway({
   environment: braintreeModule.Environment.Sandbox,
-  merchantId: '8wdhyhqpnsg7sfmx',
-  publicKey: '7dgvvkf768mptyz2',
-  privateKey: 'e0232aae435589c2233372965a5aa1ea',
+  merchantId: 'ts7vf8223fdkf9kq',
+  publicKey: 'scnnn6467rnjj2wg',
+  privateKey: '6f8a9e7a16ebc0db5aef79e53bd92445',
 });
 
 // Initialize Firebase Admin SDK
