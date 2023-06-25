@@ -53,11 +53,9 @@ const getClientToken = (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public/braintree-handler/dist')));
 
-app.get('/payment', (req, res) => {
-  // Serve your bundled React app
-  res.sendFile(path.join(__dirname, 'public/braintree-helper/dist', 'bundle.js'));
+app.get('/braintree', function (req, res) {
+  res.sendFile(path.join(__dirname, 'braintree.html'));
 });
-
 
 const processPayment = (req, res) => {
   const { nonce } = req.body;
@@ -88,6 +86,34 @@ const processPayment = (req, res) => {
     }
   });
 };
+
+app.post('/createPaymentTransaction', async (req, res) => {
+  const { body } = req;
+
+  try {
+
+    //create a transaction 
+    const result = await gateway.transaction.sale({
+      amount: body.amount,
+      paymentMethodNonce: body.nonce,
+      options: {
+        submitForSettlement: true
+      }
+    });
+
+    res.status(200).json({
+      isPaymentSuccessful: result.success,
+      errorText: result.transaction?.processorResponseText || "",
+    });
+
+  } catch (error) {
+    console.log("Error in creating transaction ", error);
+    res.status(400).json({
+      isPaymentSuccessful: false, errorText: "Error in creating the payment transaction" + error
+    });
+
+  }
+});
 
 // hello
 
