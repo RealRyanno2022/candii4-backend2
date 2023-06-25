@@ -48,6 +48,7 @@ const getClientToken = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
+      res.set('Cache-Control', 'no-store');  // add this line to set Cache-Control header
       res.send(response.clientToken);
     }
   });
