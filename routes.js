@@ -13,7 +13,7 @@ const path = require('path');
 
 const Evervault = require('@evervault/sdk');
 
-const evervaultClient = new Evervault('<your-evervault-api-key>');
+const evervaultClient = new Evervault('ev:key:1:UudU1LIXHJaIY2WC8v98JrAGwraEoTGTVYos6C8fdzpbJaELMRPwWwm60AZzcYA4:bOwQGw:jQHsW7');
 
 
 // Braintree Setup
