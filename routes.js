@@ -102,11 +102,19 @@ app.post('/createPaymentTransaction', async (req, res) => {
         submitForSettlement: true
       }
     });
-
-    res.status(200).json({
-      isPaymentSuccessful: result.success,
-      errorText: result.transaction?.processorResponseText || "",
-    });
+    
+    if (result.success) {
+      res.status(200).json({
+        isPaymentSuccessful: result.success,
+        transactionId: result.transaction.id,
+      });
+    } else {
+      res.status(200).json({
+        isPaymentSuccessful: result.success,
+        errorText: result.transaction?.processorResponseText || "",
+        errors: result.errors.deepErrors() // This will provide all the errors.
+      });
+    }
 
   } catch (error) {
     console.log("Error in creating transaction ", error);
