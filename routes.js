@@ -136,7 +136,7 @@ router.get('/posts', posts.getAllPosts);
 router.get('/posts/:id', posts.getPostById);
 router.put('/posts/:id', posts.updatePost);
 router.delete('/posts/:id', posts.deletePost);
-
+// test
 router.post('/send_email', async (req, res) => {
   const { to, subject, text } = req.body;
 
