@@ -9,6 +9,8 @@ const admin = require('firebase-admin');
 const serviceAccount = require('./candii-a8618-firebase-adminsdk-ssavy-7006eb0d3a.json');
 const braintreeModule = require('braintree');
 const path = require('path');
+const multer = require('multer');
+const upload = multer();
 
 const Evervault = require('@evervault/sdk');
 
@@ -89,6 +91,21 @@ const processPayment = (req, res) => {
   });
 };
 
+const verifyID = (side) => (req, res) => {
+  if (!req.file) {
+    console.error(`Missing ${side} of ID in request`);
+    return res.status(400).json({ error: `Missing ${side} of ID in request` });
+  }
+
+  // Simulate ID verification
+  const verificationPassed = Math.random() < 0.5;
+  if (verificationPassed) {
+    res.json({ message: `Verification Success for ${side} of ID` });
+  } else {
+    res.status(400).json({ error: `Verification Failure for ${side} of ID` });
+  }
+};
+
 app.post('/createPaymentTransaction', async (req, res) => {
   const { body } = req;
 
@@ -134,7 +151,8 @@ router.post('/login', auth.login);
 router.get('/client_token', getClientToken);
 router.post('/payment', processPayment);
 router.post('/execute_transaction', processPayment);
-
+router.post('/scan_front_of_id', upload.single('idImage'), verifyID('front'));
+router.post('/scan_back_of_id', upload.single('idImage'), verifyID('back'));
 
 
 
